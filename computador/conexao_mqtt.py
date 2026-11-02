@@ -6,6 +6,7 @@ import os
 
 # CONEXÃO COM O BANCO DE DADOS
 db_name = "db_estacao.db"
+id_estacao_padrao = 1 # ID da estação cadastrada na tabela 'estacao'
 broker_mqtt = "broker.hivemq.com"  # Configurado para o broker estável HiveMQ
 porta_mqtt = 1883
 topico_leitura = "unip/estacao_meteorologica/dados"
@@ -31,14 +32,12 @@ def on_message(client, userdata, msg):
         print(f"Mensagem recebida no tópico {msg.topic}:")
         print(json.dumps(payload, indent=2))
 
-        # Extração defensiva com tratamento de dados nulos [IA]
+        # Extração defensiva com tratamento de dados nulos
         dht_temp = payload.get("dht22", {}).get("temperatura_c")
         dht_umid = payload.get("dht22", {}).get("umidade_pct")
         bmp_press = payload.get("bmp180", {}).get("pressao_hpa")
-        bmp_temp = payload.get("bmp180", {}).get("temperatura_c")
         ldr_lum = payload.get("ldr", {}).get("luminosidade_raw")
         mq_gas = payload.get("mq", {}).get("gas_raw")
-        chuva = payload.get("pluviometro", {}).get("chuva_mm")
 
         # [MANUTENÇÃO PREVENTIVA] Verifica se o banco realmente existe no diretório atual
         if not os.path.exists(db_name):
@@ -51,16 +50,15 @@ def on_message(client, userdata, msg):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
 
-        # SQL Parametrizado limpo (sem latitude e longitude) [IA]
+        # SQL Parametrizado ajustado para a tabela 'leitura' (sem pluviometria)
         query = """
-        INSERT INTO leituras_sensores (
-            dht_temp, dht_umidade, bmp_pressao, bmp_temp, 
-            ldr_luminosidade, mq_gas, chuva_mm
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO leitura (
+            id_estacao, temperatura, umidade, pressao, 
+            qualidade_ar, luminosidade
+        ) VALUES (?, ?, ?, ?, ?, ?)
         """
         cursor.execute(query, (
-            dht_temp, dht_umid, bmp_press, bmp_temp, 
-            ldr_lum, mq_gas, chuva
+            id_estacao_padrao, dht_temp, dht_umid, bmp_press, mq_gas, ldr_lum
         ))
 
         conn.commit()

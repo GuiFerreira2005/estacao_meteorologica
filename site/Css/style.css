@@ -1,0 +1,108 @@
+:root {
+  --fundo: #f3f5f4;
+  --superficie: #ffffff;
+  --texto: #17211d;
+  --suave: #5d6b65;
+  --borda: #d8dedb;
+  --acento: #0f7b6c;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #0f1513;
+    --superficie: #18211e;
+    --texto: #e6ede9;
+    --suave: #9bada5;
+    --borda: #2a3631;
+    --acento: #3cc4ae;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--fundo);
+  color: var(--texto);
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--borda);
+}
+h1 { font-size: 1.25rem; margin: 0; }
+h2 { font-size: 1rem; margin: 0 0 12px; }
+main { max-width: 1100px; margin: 0 auto; padding: 24px; display: grid; gap: 20px; }
+.status { font-size: .85rem; color: var(--suave); text-align: right; }
+.status.ok { color: var(--acento); }
+.status.erro { color: #d64545; }
+
+/* ===== CARDS DOS SENSORES ===== */
+/* Computador: 5 cards numa linha só, todos do mesmo tamanho */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+}
+.card, .painel { background: var(--superficie); border: 1px solid var(--borda); border-radius: 8px; padding: 16px; }
+
+/* Cada card é uma coluna: o texto "Normal/Atenção" sempre fica embaixo, alinhado entre os cards */
+.card { display: flex; flex-direction: column; min-width: 0; }
+.card small { display: block; font-size: .75rem; color: var(--acento); margin-bottom: 2px; }
+.card span { display: block; font-size: .85rem; color: var(--suave); }
+.card strong { font-size: clamp(1.2rem, 2.2vw, 1.6rem); font-weight: 600; margin: 4px 0 8px; overflow-wrap: anywhere; }
+.estado {
+  display: block; font-style: normal; font-size: .8rem; color: var(--suave);
+  margin-top: auto;          /* empurra para a base do card */
+  min-height: 2.4em;         /* reserva 2 linhas, assim todos ficam com a mesma altura */
+  overflow-wrap: anywhere;
+}
+
+/* Celular e tablet: 2 cards por linha; se sobrar um, ele ocupa a linha inteira */
+@media (max-width: 900px) {
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .card strong { font-size: clamp(1.2rem, 5vw, 1.6rem); }
+}
+
+/* ===== HISTÓRICO ===== */
+.topo-historico {
+  display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: space-between; gap: 8px 16px; margin-bottom: 12px;
+}
+.topo-historico h2 { margin: 0; }
+.seletor-area { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--suave); }
+.painel h3 { font-size: .9rem; margin: 0 0 8px; font-weight: 600; }
+.grafico { position: relative; height: 320px; }
+
+#mapa { height: 400px; border-radius: 8px; width: 100%; }
+form { display: flex; flex-wrap: wrap; gap: 8px; }
+input, button, select { font: inherit; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--borda); }
+input { background: var(--fundo); color: var(--texto); width: 150px; }
+select { background: var(--fundo); color: var(--texto); max-width: 100%; cursor: pointer; }
+button { background: var(--acento); color: #fff; border-color: var(--acento); cursor: pointer; }
+button.sec { background: transparent; color: var(--texto); border-color: var(--borda); }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+/* ===== ALERTAS ===== */
+.card.ok .estado { color: var(--acento); }
+.card.atencao { border-color: #d98e04; }
+.card.atencao .estado { color: #b36f00; font-weight: 600; }
+.card.critico { border-color: #d64545; box-shadow: inset 0 0 0 1px #d64545; }
+.card.critico .estado { color: #d64545; font-weight: 600; }
+.avisos { display: grid; gap: 8px; }
+.avisos[hidden] { display: none; }
+.aviso { padding: 10px 14px; border-radius: 6px; border-left: 4px solid #d98e04; background: var(--superficie); }
+.aviso.critico { border-left-color: #d64545; }
+
+/* ===== TELAS PEQUENAS ===== */
+@media (max-width: 600px) {
+  header { padding: 12px 16px; }
+  main { padding: 12px; gap: 14px; }
+  .card, .painel { padding: 12px; }
+  .grafico { height: 240px; }
+  #mapa { height: 300px; }
+  .seletor-area { width: 100%; }
+  .seletor-area select { flex: 1; }
+}
